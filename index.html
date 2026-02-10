@@ -1,0 +1,612 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/index.html b/index.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..2c2c1358289fce315c475f97fa408a48d58d8bd0
+--- /dev/null
++++ b/index.html
+@@ -0,0 +1,602 @@
++<!DOCTYPE html>
++<html lang="fr">
++<head>
++  <meta charset="UTF-8" />
++  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++  <title>Diagnostic rapide : Croissance vs. Saturation opérationnelle</title>
++  <meta name="description" content="Diagnostic anonyme en 90 secondes pour dirigeants belges énergie et services techniques B2B." />
++  <style>
++    :root {
++      --blue: #000887;
++      --pink: #ED51C2;
++      --white: #FFFFFF;
++      --text: #0f1238;
++      --muted: #53587a;
++      --green: #1e9d5a;
++      --yellow: #cc9b00;
++      --orange: #d45b00;
++      --red: #b91644;
++      --radius: 16px;
++      --shadow: 0 12px 30px rgba(0, 8, 135, 0.12);
++    }
++
++    * { box-sizing: border-box; }
++
++    body {
++      margin: 0;
++      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
++      background: var(--white);
++      color: var(--text);
++      min-height: 100vh;
++      display: flex;
++      flex-direction: column;
++    }
++
++    a { color: inherit; }
++
++    .container {
++      width: min(920px, 92vw);
++      margin: 0 auto;
++    }
++
++    header {
++      padding: 1rem 0 0;
++    }
++
++    .logo-link {
++      display: inline-flex;
++      align-items: center;
++      text-decoration: none;
++      border-radius: 999px;
++      outline: none;
++    }
++
++    .logo {
++      width: 52px;
++      height: 52px;
++      border-radius: 50%;
++      object-fit: cover;
++      border: 2px solid rgba(0, 8, 135, 0.2);
++      background: var(--white);
++    }
++
++    main {
++      flex: 1;
++      display: grid;
++      align-items: center;
++      padding: 0.5rem 0 1.5rem;
++    }
++
++    .screen {
++      display: none;
++      background: var(--white);
++      border: 1px solid rgba(0, 8, 135, 0.1);
++      border-radius: var(--radius);
++      box-shadow: var(--shadow);
++      padding: 1.25rem;
++    }
++
++    .screen.active {
++      display: block;
++    }
++
++    .hero {
++      text-align: center;
++      padding: 2rem 1.2rem;
++    }
++
++    h1 {
++      margin: 0 0 0.75rem;
++      color: var(--blue);
++      font-size: clamp(1.5rem, 4vw, 2rem);
++      line-height: 1.2;
++    }
++
++    .subtitle {
++      margin: 0 auto 1rem;
++      max-width: 640px;
++      font-weight: 600;
++      color: var(--text);
++    }
++
++    .lead {
++      margin: 0 auto 1.5rem;
++      max-width: 680px;
++      color: var(--muted);
++      line-height: 1.5;
++    }
++
++    .btn {
++      border: none;
++      border-radius: 999px;
++      padding: 0.85rem 1.2rem;
++      font-size: 1rem;
++      font-weight: 600;
++      cursor: pointer;
++      transition: transform .08s ease, opacity .2s ease;
++      text-decoration: none;
++      display: inline-flex;
++      justify-content: center;
++      align-items: center;
++      gap: 0.4rem;
++      min-height: 46px;
++    }
++
++    .btn:active { transform: translateY(1px); }
++    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
++
++    .btn-primary {
++      background: var(--blue);
++      color: var(--white);
++    }
++
++    .btn-accent {
++      background: var(--pink);
++      color: var(--white);
++    }
++
++    .progress-wrap {
++      margin-bottom: 1rem;
++    }
++
++    .progress-meta {
++      font-size: 0.9rem;
++      color: var(--muted);
++      margin-bottom: 0.4rem;
++      display: flex;
++      justify-content: space-between;
++    }
++
++    .progress {
++      height: 10px;
++      background: #eceefe;
++      border-radius: 99px;
++      overflow: hidden;
++    }
++
++    .progress > span {
++      display: block;
++      width: 0;
++      height: 100%;
++      background: linear-gradient(90deg, var(--blue), var(--pink));
++      transition: width .25s ease;
++    }
++
++    .question-card {
++      min-height: 65vh;
++      display: flex;
++      flex-direction: column;
++      justify-content: center;
++      gap: 1rem;
++    }
++
++    .question-title {
++      font-size: clamp(1.15rem, 2.6vw, 1.5rem);
++      color: var(--blue);
++      margin: 0;
++      line-height: 1.35;
++    }
++
++    .answer-grid {
++      display: grid;
++      gap: 0.75rem;
++      grid-template-columns: 1fr;
++    }
++
++    .answer-btn {
++      border: 2px solid rgba(0, 8, 135, 0.3);
++      background: var(--white);
++      color: var(--blue);
++      border-radius: 12px;
++      padding: 1rem;
++      font-size: 1rem;
++      font-weight: 700;
++      cursor: pointer;
++    }
++
++    .answer-btn.selected {
++      border-color: var(--pink);
++      background: rgba(237, 81, 194, 0.1);
++      color: #750052;
++    }
++
++    .reassurance {
++      margin: 0;
++      font-size: 0.92rem;
++      color: var(--muted);
++      border-left: 3px solid var(--pink);
++      padding-left: 0.8rem;
++    }
++
++    .nav-row {
++      display: flex;
++      justify-content: space-between;
++      gap: 0.8rem;
++      align-items: center;
++      flex-wrap: wrap;
++    }
++
++    .link-back {
++      border: none;
++      background: transparent;
++      color: var(--blue);
++      text-decoration: underline;
++      cursor: pointer;
++      padding: 0;
++      font-size: 0.93rem;
++    }
++
++    .result-title {
++      margin-top: 0;
++      color: var(--blue);
++      text-align: center;
++    }
++
++    .gauge {
++      margin: 0.8rem auto;
++      width: min(420px, 95%);
++      background: #eceefe;
++      border-radius: 999px;
++      height: 18px;
++      overflow: hidden;
++    }
++
++    .gauge > span {
++      display: block;
++      width: 0;
++      height: 100%;
++      transition: width .35s ease;
++    }
++
++    .result-text {
++      text-align: center;
++      color: var(--muted);
++      max-width: 760px;
++      margin: 0.6rem auto 1rem;
++      line-height: 1.45;
++    }
++
++    .pill {
++      display: inline-block;
++      border-radius: 999px;
++      padding: 0.35rem 0.75rem;
++      font-size: 0.86rem;
++      font-weight: 700;
++      background: #f1f2ff;
++      color: var(--blue);
++      margin: 0 auto 0.6rem;
++    }
++
++    .list-title {
++      margin-top: 1.2rem;
++      color: var(--blue);
++      font-size: 1.02rem;
++    }
++
++    ol {
++      margin: 0.5rem 0 1rem 1.2rem;
++      padding: 0;
++      color: var(--text);
++      line-height: 1.4;
++      display: grid;
++      gap: 0.45rem;
++    }
++
++    .teaser {
++      width: 100%;
++      min-height: 86px;
++      border: 1px solid rgba(0, 8, 135, 0.25);
++      border-radius: 10px;
++      padding: 0.7rem;
++      font: inherit;
++      resize: vertical;
++    }
++
++    .actions {
++      display: grid;
++      gap: 0.7rem;
++      margin-top: 1rem;
++    }
++
++    footer {
++      border-top: 1px solid rgba(0, 8, 135, 0.14);
++      text-align: center;
++      padding: 0.95rem 0 1.4rem;
++      color: var(--muted);
++      font-size: 0.92rem;
++    }
++
++    @media (min-width: 760px) {
++      .screen { padding: 1.5rem; }
++      .answer-grid { grid-template-columns: repeat(2, 1fr); }
++      .actions { grid-template-columns: repeat(2, 1fr); }
++      .question-card { min-height: 58vh; }
++    }
++  </style>
++</head>
++<body>
++  <header class="container">
++    <a class="logo-link" href="https://homieuxmedia.com/" target="_blank" rel="noopener noreferrer" aria-label="Homieux Media">
++      <img class="logo" src="logo.png" alt="Logo Homieux Media" />
++    </a>
++  </header>
++
++  <main class="container">
++    <section id="home" class="screen active hero" aria-live="polite">
++      <h1>Diagnostic rapide : Croissance vs. Saturation opérationnelle</h1>
++      <p class="subtitle">Évaluez en 90 secondes le décalage entre les attentes de votre board et votre réalité technique.</p>
++      <p class="lead">Cet outil s’adresse aux dirigeants belges de l’énergie et des services techniques B2B, où la croissance est exigée alors que la capacité est souvent déjà saturée. Aucun engagement. Aucune donnée sensible collectée.</p>
++      <button id="startBtn" class="btn btn-primary">Commencer</button>
++    </section>
++
++    <section id="quiz" class="screen" aria-live="polite">
++      <div class="progress-wrap">
++        <div class="progress-meta">
++          <span>Progression</span>
++          <strong id="progressText">0/10</strong>
++        </div>
++        <div class="progress"><span id="progressBar"></span></div>
++      </div>
++
++      <article class="question-card">
++        <h2 id="questionText" class="question-title"></h2>
++        <div class="answer-grid">
++          <button type="button" data-answer="yes" class="answer-btn">Oui</button>
++          <button type="button" data-answer="no" class="answer-btn">Non</button>
++        </div>
++        <p class="reassurance">Pas de bonne ou mauvaise réponse. L’objectif est de clarifier votre position stratégique, comme pour de nombreux dirigeants belges dans votre secteur.</p>
++        <div class="nav-row">
++          <button id="backBtn" type="button" class="link-back">Revenir</button>
++          <button id="nextBtn" type="button" class="btn btn-primary" disabled>Suivant</button>
++        </div>
++      </article>
++    </section>
++
++    <section id="result" class="screen" aria-live="polite">
++      <h2 id="scoreTitle" class="result-title"></h2>
++      <div class="pill" id="scoreLevel"></div>
++      <div class="gauge"><span id="gaugeFill"></span></div>
++      <p class="result-text">Un score élevé indique un décalage significatif entre les exigences de croissance et la capacité opérationnelle réelle. Dans le contexte belge actuel — pression sur la rentabilité, cycles longs, saturation fréquente — cette situation est largement observée.</p>
++
++      <h3 class="list-title">Reformulations board-ready à tester</h3>
++      <ol id="reframeList"></ol>
++
++      <label class="list-title" for="teaserInput">Lequel de ces points reflète le mieux votre situation actuelle ?</label>
++      <textarea id="teaserInput" class="teaser" placeholder="Votre contexte en quelques mots (optionnel)"></textarea>
++
++      <div class="actions">
++        <button id="pdfBtn" type="button" class="btn btn-primary">Télécharger le PDF</button>
++        <a id="calendlyBtn" class="btn btn-accent" href="#" target="_blank" rel="noopener noreferrer">Discutons de votre cas concret – 20 min sans engagement</a>
++      </div>
++    </section>
++  </main>
++
++  <footer>
++    © 2026 · <a href="https://homieuxmedia.com/" target="_blank" rel="noopener noreferrer">https://homieuxmedia.com/</a>
++  </footer>
++
++  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrRacvrVJ6M90oCbGyF/F7kh/3Gzdh0dX8GZFODdgNpTi27C/medhOiabuX41sJLdnOjFkWDXLI4YAl4kzbA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
++  <script>
++    const questions = [
++      "Votre acquisition de clients repose-t-elle principalement sur des réseaux personnels et des recommandations ?",
++      "Votre board se concentre-t-il principalement sur des objectifs de volume de revenus ?",
++      "Vos cycles de vente sont-ils irréguliers, souvent entre 3 et 12 mois ?",
++      "Votre capacité opérationnelle technique est-elle déjà à saturation ?",
++      "Votre présence digitale est-elle faible pour signaler votre expertise technique ?",
++      "Votre CRM est-il sous-utilisé pour suivre la prévisibilité des opportunités ?",
++      "Votre board voit-il la croissance uniquement comme une question de volume ?",
++      "Les deals à haute valeur ne sont-ils pas priorisés dans votre pipeline ?",
++      "Les recommandations clients sont-elles en déclin ?",
++      "Manquez-vous de métriques pour réduire les risques liés à votre croissance ?"
++    ];
++
++    const weights = questions.map((_, i) => (i === 3 || i === 6 ? 1.5 : 1));
++    const maxWeighted = weights.reduce((sum, v) => sum + v, 0);
++
++    const poolUrgence = [
++      "Passer d’un objectif de volume à un objectif de marge récurrente sur les contrats existants.",
++      "Prioriser la qualité des deals plutôt que leur quantité pour préserver la capacité technique.",
++      "Réduire le risque via des métriques prédictives plutôt que des objectifs bruts.",
++      "Séquencer la croissance commerciale selon la capacité opérationnelle réellement disponible.",
++      "Recentrer les objectifs trimestriels sur la rentabilité et la tenue des engagements clients."
++    ];
++
++    const poolPrevention = [
++      "Structurer un pilotage commun board-opérations avant d’augmenter le volume commercial.",
++      "Maintenir un équilibre entre nouveaux revenus et robustesse de la livraison technique.",
++      "Formaliser des indicateurs d’alerte précoces pour éviter la saturation progressive.",
++      "Documenter les critères de qualification des opportunités à forte valeur.",
++      "Ancrer des revues mensuelles orientées marge, capacité et qualité de service."
++    ];
++
++    const poolGeneral = [
++      "Diversifier l’acquisition au-delà des réseaux personnels pour stabiliser la croissance.",
++      "Renforcer la signalisation d’expertise pour attirer des opportunités à plus forte valeur.",
++      "Mieux exploiter le CRM pour fiabiliser la visibilité du pipeline et des cycles longs.",
++      "Arbitrer les priorités commerciales en fonction de la charge technique réelle.",
++      "Aligner les décisions de croissance sur la réalité des ressources critiques."
++    ];
++
++    let current = 0;
++    const answers = new Array(questions.length).fill(null);
++
++    const home = document.getElementById('home');
++    const quiz = document.getElementById('quiz');
++    const result = document.getElementById('result');
++
++    const progressText = document.getElementById('progressText');
++    const progressBar = document.getElementById('progressBar');
++    const questionText = document.getElementById('questionText');
++    const nextBtn = document.getElementById('nextBtn');
++    const backBtn = document.getElementById('backBtn');
++    const answerBtns = [...document.querySelectorAll('.answer-btn')];
++
++    const scoreTitle = document.getElementById('scoreTitle');
++    const scoreLevel = document.getElementById('scoreLevel');
++    const gaugeFill = document.getElementById('gaugeFill');
++    const reframeList = document.getElementById('reframeList');
++    const teaserInput = document.getElementById('teaserInput');
++    const calendlyBtn = document.getElementById('calendlyBtn');
++
++    document.getElementById('startBtn').addEventListener('click', () => {
++      switchScreen('quiz');
++      renderQuestion();
++    });
++
++    answerBtns.forEach((btn) => {
++      btn.addEventListener('click', () => {
++        answers[current] = btn.dataset.answer === 'yes';
++        renderQuestion();
++      });
++    });
++
++    nextBtn.addEventListener('click', () => {
++      if (answers[current] === null) return;
++      if (current < questions.length - 1) {
++        current += 1;
++        renderQuestion();
++      } else {
++        renderResult();
++      }
++    });
++
++    backBtn.addEventListener('click', () => {
++      if (current > 0) {
++        current -= 1;
++        renderQuestion();
++      } else {
++        switchScreen('home');
++      }
++    });
++
++    function renderQuestion() {
++      const answeredCount = answers.filter((a) => a !== null).length;
++      const progress = Math.round((answeredCount / questions.length) * 100);
++
++      questionText.textContent = questions[current];
++      progressText.textContent = `${answeredCount}/10`;
++      progressBar.style.width = `${progress}%`;
++
++      answerBtns.forEach((btn) => {
++        const value = btn.dataset.answer === 'yes';
++        btn.classList.toggle('selected', answers[current] === value);
++      });
++
++      nextBtn.disabled = answers[current] === null;
++    }
++
++    function buildReframes(score) {
++      const selected = [];
++
++      if (score >= 7) {
++        selected.push(...poolUrgence.slice(0, 3));
++      } else if (score < 4) {
++        selected.push(...poolPrevention.slice(0, 3));
++      } else {
++        selected.push(poolGeneral[0], poolGeneral[2], poolGeneral[3]);
++      }
++
++      if (answers[0] && answers[8]) {
++        selected.push("Diversifier l’acquisition au-delà des recommandations pour réduire la dépendance réseau.");
++      }
++
++      const merged = [...selected, ...poolGeneral, ...poolUrgence, ...poolPrevention]
++        .filter((item, idx, arr) => arr.indexOf(item) === idx)
++        .slice(0, 5);
++
++      return merged;
++    }
++
++    function calculateScore() {
++      const weightedTotal = answers.reduce((sum, answer, idx) => sum + (answer ? weights[idx] : 0), 0);
++      return Math.round((weightedTotal / maxWeighted) * 10);
++    }
++
++    function renderResult() {
++      const score = calculateScore();
++      const reframes = buildReframes(score);
++      const level = score < 4 ? 'Prévention / structuration' : score <= 6 ? 'Point d’attention' : 'Urgence / risque';
++      const gaugeColor = score < 4 ? 'var(--green)' : score <= 6 ? 'var(--yellow)' : score <= 8 ? 'var(--orange)' : 'var(--red)';
++
++      scoreTitle.textContent = `Votre score : ${score}/10`;
++      scoreLevel.textContent = level;
++      gaugeFill.style.width = `${score * 10}%`;
++      gaugeFill.style.background = gaugeColor;
++
++      reframeList.innerHTML = '';
++      reframes.forEach((line) => {
++        const li = document.createElement('li');
++        li.textContent = line;
++        reframeList.appendChild(li);
++      });
++
++      const base = 'https://calendly.com/homieuxmedia/discovery-call-gratuit-discutons-de-vos-defis';
++      const params = new URLSearchParams({
++        utm_source: 'diagnostic-croissance-saturation',
++        score: String(score)
++      });
++      calendlyBtn.href = `${base}?${params.toString()}`;
++
++      document.getElementById('pdfBtn').onclick = () => downloadPDF(score, reframes);
++      switchScreen('result');
++    }
++
++    function downloadPDF(score, reframes) {
++      if (!window.jspdf) {
++        alert('Le module PDF n’est pas disponible actuellement.');
++        return;
++      }
++
++      const { jsPDF } = window.jspdf;
++      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
++      const date = new Date().toLocaleDateString('fr-BE');
++      const teaser = teaserInput.value.trim();
++      let y = 56;
++
++      doc.setFont('helvetica', 'bold');
++      doc.setTextColor(0, 8, 135);
++      doc.setFontSize(16);
++      doc.text('Diagnostic rapide : Croissance vs. Saturation opérationnelle', 40, y);
++
++      y += 26;
++      doc.setFontSize(12);
++      doc.setFont('helvetica', 'normal');
++      doc.setTextColor(30, 36, 92);
++      doc.text(`Date : ${date}`, 40, y);
++
++      y += 20;
++      doc.text(`Score : ${score}/10`, 40, y);
++
++      y += 24;
++      doc.setFont('helvetica', 'bold');
++      doc.text('Reformulations board-ready', 40, y);
++
++      y += 18;
++      doc.setFont('helvetica', 'normal');
++      reframes.forEach((line, idx) => {
++        const wrapped = doc.splitTextToSize(`${idx + 1}. ${line}`, 515);
++        doc.text(wrapped, 40, y);
++        y += wrapped.length * 14 + 4;
++      });
++
++      if (teaser) {
++        y += 10;
++        doc.setFont('helvetica', 'bold');
++        doc.text('Point reflétant le mieux votre situation', 40, y);
++        y += 18;
++        doc.setFont('helvetica', 'normal');
++        const teaserWrap = doc.splitTextToSize(teaser, 515);
++        doc.text(teaserWrap, 40, y);
++      }
++
++      doc.save(`diagnostic-croissance-saturation-${date.replaceAll('/', '-')}.pdf`);
++    }
++
++    function switchScreen(id) {
++      [home, quiz, result].forEach((el) => el.classList.remove('active'));
++      document.getElementById(id).classList.add('active');
++      window.scrollTo({ top: 0, behavior: 'smooth' });
++    }
++  </script>
++</body>
++</html>
+ 
+EOF
+)
